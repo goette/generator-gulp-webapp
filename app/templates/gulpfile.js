@@ -3,19 +3,29 @@
 
 var gulp = require('gulp');
 var open = require('open');
+var gutil = require('gulp-util');
 var wiredep = require('wiredep').stream;
 
 // Load plugins
 var $ = require('gulp-load-plugins')();
 
+// JST
+gulp.task('jst', function () {
+  return gulp.src('app/scripts/templates/*.ejs')
+    .pipe($.jstConcat('templates.js', {
+        renameKeys: ['^.*templates/(.*).ejs$', '$1']
+    }))
+    .pipe(gulp.dest('app/scripts/'))
+});
+
 <% if (includeSass) { %>
 // Styles
 gulp.task('styles', function () {
-    return gulp.src('app/styles/main.scss')
+    return gulp.src('app/styles/main.sass')
         .pipe($.rubySass({
           style: 'expanded',
           loadPath: ['app/bower_components']
-        }))
+        }).on('error', gutil.log))
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('app/styles'))
         .pipe($.size());
@@ -36,6 +46,13 @@ gulp.task('scripts', function () {
         .pipe($.jshint.reporter('default'))
         .pipe($.size());
 });
+
+gulp.task('coffee', function() {
+  return gulp.src('app/scripts/**/*.coffee')
+    .pipe($.coffee({bare: true}).on('error', gutil.log))
+    .pipe(gulp.dest('app/scripts/'))
+});
+
 
 // HTML
 gulp.task('html', ['styles', 'scripts'], function () {
@@ -95,7 +112,7 @@ gulp.task('serve', ['connect'<% if (includeSass) { %>, 'styles'<% } %>], functio
 
 // Inject Bower components
 gulp.task('wiredep', function () {
-    gulp.src('app/styles/*.<% if (includeSass) { %>scss<% } else { %>css<% } %>')
+    gulp.src('app/styles/*.<% if (includeSass) { %>sass<% } else { %>css<% } %>')
         .pipe(wiredep({
             directory: 'app/bower_components',
             ignorePath: 'app/bower_components/'
@@ -114,24 +131,30 @@ gulp.task('wiredep', function () {
 gulp.task('watch', ['connect', 'serve'], function () {
     // Watch for changes in `app` folder
     gulp.watch([
-        'app/*.html',<% if (includeSass) { %>
-        'app/styles/**/*.scss',<% } else { %>
-        'app/styles/**/*.css',<% } %>
+        'app/*.html',
+        'app/styles/**/*.css',
         'app/scripts/**/*.js',
+        'app/scripts/**/*.ejs',
         'app/images/**/*'
     ], function (event) {
         return gulp.src(event.path)
             .pipe($.connect.reload());
     });
 
-    <% if (includeSass) { %>// Watch .scss files
-    gulp.watch('app/styles/**/*.scss', ['styles']);
+    <% if (includeSass) { %>// Watch .sass files
+    gulp.watch('app/styles/**/*.sass', ['styles']);
 
     <% } else { %>// Watch .css files
     gulp.watch('app/styles/**/*.css', ['styles']);
 
     <% }  %>// Watch .js files
-    gulp.watch('app/scripts/**/*.js', ['scripts']);
+    // gulp.watch('app/scripts/**/*.js', ['scripts']);
+
+    // Watch .coffee files
+    gulp.watch('app/scripts/**/*.coffee', ['coffee']);
+
+    // Watch .ejs files
+    gulp.watch('app/scripts/templates/*.ejs', ['jst']);
 
     // Watch image files
     gulp.watch('app/images/**/*', ['images']);

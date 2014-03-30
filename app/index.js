@@ -38,7 +38,7 @@ AppGenerator.prototype.askFor = function askFor() {
   // welcome message
   if (!this.options['skip-welcome-message']) {
     console.log(this.yeoman);
-    console.log(chalk.magenta('Out of the box I include HTML5 Boilerplate, jQuery, and a gulpfile.js to build your app.'));
+    console.log(chalk.magenta('Out of the box I include HTML5 Boilerplate, jQuery, Backbone, LoDash, Sass, CoffeeScript and a gulpfile.js to build your app.'));
   }
 
   var prompts = [{
@@ -46,13 +46,13 @@ AppGenerator.prototype.askFor = function askFor() {
     name: 'features',
     message: 'What more would you like?',
     choices: [{
-      name: 'Sass with Compass',
+      name: 'Sass',
       value: 'includeSass',
       checked: true
     }, {
       name: 'Bootstrap',
       value: 'includeBootstrap',
-      checked: true
+      checked: false
     }, {
       name: 'Modernizr',
       value: 'includeModernizr',
@@ -109,7 +109,7 @@ AppGenerator.prototype.h5bp = function h5bp() {
 };
 
 AppGenerator.prototype.mainStylesheet = function mainStylesheet() {
-  var css = 'main.' + (this.includeSass ? 's' : '') + 'css';
+  var css = 'main.' + (this.includeSass ? 'sass' : 'css');
   this.copy(css, 'app/styles/' + css);
 };
 
