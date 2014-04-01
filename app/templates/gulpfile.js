@@ -39,6 +39,7 @@ gulp.task('styles', function () {
         .pipe($.size());
 });
 <% } %>
+
 // Scripts
 gulp.task('scripts', function () {
     return gulp.src('app/scripts/**/*.js')
@@ -47,9 +48,14 @@ gulp.task('scripts', function () {
         .pipe($.size());
 });
 
+// Coffee
 gulp.task('coffee', function() {
-  return gulp.src('app/scripts/**/*.coffee')
-    .pipe($.coffee({bare: true}).on('error', gutil.log))
+  return gulp.src('app/scripts/app.coffee', { read: false })
+    .pipe($.browserify({
+      transform: ['coffeeify'],
+      extensions: ['.coffee']
+    }).on('error', gutil.log))
+    .pipe($.rename('app.js'))
     .pipe(gulp.dest('app/scripts/'))
 });
 
@@ -106,7 +112,7 @@ gulp.task('connect', $.connect.server({
 }));
 
 // Open
-gulp.task('serve', ['connect'<% if (includeSass) { %>, 'styles'<% } %>], function() {
+gulp.task('serve', ['connect', 'coffee'<% if (includeSass) { %>, 'styles'<% } %>], function() {
   open("http://localhost:9000");
 });
 

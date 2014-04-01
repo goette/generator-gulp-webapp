@@ -139,8 +139,8 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
   this.indexFile = this.appendFiles({
     html: this.indexFile,
     fileType: 'js',
-    optimizedPath: 'scripts/boot.js',
-    sourceFileList: ['scripts/boot.js']
+    optimizedPath: 'scripts/app.js',
+    sourceFileList: ['scripts/app.js']
   });
 };
 
@@ -150,7 +150,7 @@ AppGenerator.prototype.app = function app() {
   this.mkdir('app/styles');
   this.mkdir('app/images');
   this.write('app/index.html', this.indexFile);
-  this.write('app/scripts/boot.js', 'console.log(\'\\\'Allo \\\'Allo!\');');
+  this.write('app/scripts/app.coffee', 'console.log \'Yay Yo!\'');
 };
 
 AppGenerator.prototype.install = function () {
